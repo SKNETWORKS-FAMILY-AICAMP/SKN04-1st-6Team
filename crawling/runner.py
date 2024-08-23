@@ -6,5 +6,5 @@ HOST = 'localhost'
 PORT = 5432
 DB_NAME = 'postgres'
 
-# car_data_to_db(name=USERNAME, password=PASSWORD, host=HOST, port=PORT, db_name=DB_NAME)
+car_data_to_db(name=USERNAME, password=PASSWORD, host=HOST, port=PORT, db_name=DB_NAME)
 faq_data_to_db(name=USERNAME, password=PASSWORD, host=HOST, port=PORT, db_name=DB_NAME)
