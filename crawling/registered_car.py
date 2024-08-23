@@ -17,7 +17,7 @@ def registrated_car_crawler(start_date='202201', end_date='202407'):
             continue
         car_ = {}
         car_['region'] = item.get('C1_NM')      
-        car_['count'] = item.get('DT')
+        car_['count'] = int(item.get('DT'))
         car_['type'] = item.get('C3_NM')
         car_['usage'] = item.get('ITM_NM')     
         car_['date'] = item.get('PRD_DE')
