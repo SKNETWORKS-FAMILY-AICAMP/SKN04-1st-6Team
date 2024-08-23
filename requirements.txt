@@ -1,0 +1,10 @@
+beautifulsoup4==4.12.3
+lxml==5.2.1
+pandas==2.2.2
+psycopg2==2.9.9
+Requests==2.32.3
+selenium==4.23.1
+SQLAlchemy==2.0.30
+streamlit_option_menu==0.3.13
+tqdm==4.66.5
+webdriver_manager==4.0.2
