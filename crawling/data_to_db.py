@@ -18,6 +18,11 @@ def faq_data_to_db(**kwargs):
     engine = create_db_engine(**kwargs)
     car_corp_df = pd.DataFrame({'id': [hyundat_faq_df['id'].values[0], kia_faq_df['id'].values[0]], 'corp_name': ['현대', '기아']})
     
+    with engine.connect() as con:
+        con.execute(text('DROP TABLE IF EXISTS car_corp CASCADE;'))
+        con.execute(text('DROP TABLE IF EXISTS car_faq CASCADE;'))
+        con.commit()
+
     car_corp_df.to_sql(
         'car_corp',
         engine,
@@ -50,10 +55,15 @@ def faq_data_to_db(**kwargs):
 def car_data_to_db(**kwargs):
     data = registrated_car_crawler()
     engine = create_db_engine(**kwargs)
-
+    
+    with engine.connect() as con:
+        con.execute(text('DROP TABLE IF EXISTS registererd_car CASCADE;'))
+        con.commit()
+    
     data.to_sql(
         'registererd_car',
         engine,
+        if_exists='replace',
         dtype={
             'region': VARCHAR(5),
             'count': Integer,
