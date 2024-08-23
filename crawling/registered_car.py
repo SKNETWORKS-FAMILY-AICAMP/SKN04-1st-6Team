@@ -5,6 +5,7 @@ import itertools
 import xml.etree.ElementTree as ET
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+from datetime import datetime
 
 
 def registrated_car_crawler(start_date='202201', end_date='202407'):
@@ -20,7 +21,7 @@ def registrated_car_crawler(start_date='202201', end_date='202407'):
         car_['count'] = int(item.get('DT'))
         car_['type'] = item.get('C3_NM')
         car_['usage'] = item.get('ITM_NM')     
-        car_['date'] = item.get('PRD_DE')
+        car_['date'] = datetime.strptime(item.get('PRD_DE'), "%Y%m")
         total_car_list.append(car_)
         
     return pd.DataFrame(total_car_list)
