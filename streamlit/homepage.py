@@ -4,25 +4,6 @@ import requests
 import streamlit as st
 from datetime import datetime
 
-def registrated_car_crawler(start_date='202201', end_date='202407'):
-    url = f'https://kosis.kr/openapi/Param/statisticsParameterData.do?method=getList&apiKey=Mjc4NzI4OThmZWZiZmVmZjczMDQyNzg4MmZkNjBkYTg=&itmId=13103873443T1+13103873443T2+13103873443T3+13103873443T4+&objL1=ALL&objL2=13102873443B.0002+&objL3=13102873443C.0001+13102873443C.0002+13102873443C.0003+13102873443C.0004+&objL4=&objL5=&objL6=&objL7=&objL8=&format=json&jsonVD=Y&prdSe=M&startPrdDe={start_date}&endPrdDe={end_date}&outputFields=NM+ITM_NM+UNIT_NM+PRD_DE+&orgId=116&tblId=DT_MLTM_5498'
-    response = requests.get(url)
-    results = json.loads(response.text)
-    total_car_list = []
-    for item in results:
-        if item.get('ITM_NM') == '계':
-            continue
-        car_ = {
-            'region': item.get('C1_NM'),
-            'count': item.get('DT'),
-            'type': item.get('C3_NM'),
-            'usage': item.get('ITM_NM'),
-            'date': item.get('PRD_DE')
-        }
-        total_car_list.append(car_)
-        
-    return pd.DataFrame(total_car_list)
-
 # Streamlit UI
 st.title('차량 등록 대수 조회기')
 
@@ -31,13 +12,17 @@ start_date = st.text_input('시작 날짜 (YYYYMM 형식):', '202401')
 end_date = st.text_input('종료 날짜 (YYYYMM 형식):', '202407')
 
 #날짜 포맷 변경 YYYYMM -> YYYY-MM
-def format_date(date_str):
-    return datetime.strptime(date_str, '%Y%m').strftime('%Y년%m월')
+def format_date(date_str, format: str='%Y년%m월'):
+    return datetime.strptime(date_str, '%Y%m').strftime(format)
 
 # 데이터 로드 및 필터링
 if st.button('조회'):
     if start_date and end_date:
-        df = registrated_car_crawler(start_date, end_date)
+        conn = st.connection('postgresql', type='sql')
+        start_date_ = format_date(start_date, '%Y-%m-%d')
+        end_date_ = format_date(end_date, '%Y-%m-%d')
+        df = conn.query(f"SELECT * FROM registererd_car WHERE date >= '{start_date_}' AND date <= '{end_date_}'")
+        #df = registrated_car_crawler(start_date, end_date)
         
         st.divider()
 
@@ -53,7 +38,7 @@ if st.button('조회'):
             with tabs[0]:
             # 월별 전국 차량 등록 대수 증감추이
                 st.subheader('월별 전국 차량 등록 대수 증감추이')
-                df['count_int'] = pd.to_numeric(df['count'].str.replace(',', ''), errors='coerce')  # 숫자로 변환, 오류는 NaN 처리
+                df['count_int'] = pd.to_numeric(df['count'], errors='coerce')  # 숫자로 변환, 오류는 NaN 처리
                 count_data = df.groupby('date')['count_int'].sum().reset_index()
                 count_data.sort_values('date', inplace=True)
                 count_data['percent_change'] = count_data['count_int'].diff()
@@ -65,7 +50,7 @@ if st.button('조회'):
             with tabs[1]:
                 # 차종별 등록 대수 증감추이
                 st.subheader('차종별 등록 대수 증감추이')
-                df['count_int'] = pd.to_numeric(df['count'].str.replace(',', ''), errors='coerce')  # 숫자로 변환, 오류는 NaN 처리
+                df['count_int'] = pd.to_numeric(df['count'], errors='coerce')  # 숫자로 변환, 오류는 NaN 처리
                 line_data = df.groupby(['date', 'type'])['count_int'].sum().reset_index()
                 line_data.sort_values(['type', 'date'], inplace=True)
                 
@@ -79,7 +64,7 @@ if st.button('조회'):
             with tabs[2]:    
                 # 용도별 등록 대수 증감추이
                 st.subheader('용도별 등록 대수 증감추이')
-                df['count_int'] = pd.to_numeric(df['count'].str.replace(',', ''), errors='coerce')  # 숫자로 변환, 오류는 NaN 처리
+                df['count_int'] = pd.to_numeric(df['count'], errors='coerce')  # 숫자로 변환, 오류는 NaN 처리
                 line_data = df.groupby(['date', 'usage'])['count_int'].sum().reset_index()
                 line_data.sort_values(['usage', 'date'], inplace=True)
 
