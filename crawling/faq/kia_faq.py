@@ -41,6 +41,6 @@ def kia_faq_crawl() ->pd.DataFrame:
     #데이터프레임 만들기
     data_list=[]
     for question, answer in zip(kia_questions, kia_answers):
-        temp = {'질문':{question},'답변':{answer}}
+        temp = {'id':'K', 'question':question,'answer':answer}
         data_list.append(temp)
     return pd.DataFrame(data_list)
