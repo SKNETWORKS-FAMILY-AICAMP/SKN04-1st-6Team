@@ -4,9 +4,6 @@ import streamlit as st
 import pandas as pd
 from sqlalchemy import create_engine
 
-#db연결
-# engine = create_engine('postgres://username:password@host/database')
-
 def fetch_qa_data():
     # 데이터베이스에서 Q&A 데이터 가져오기
     conn = st.connection('postgresql', type='sql')
@@ -57,7 +54,6 @@ def car_faq_page():
         else:
             st.session_state.active_qa = 'K'
 
-    # 검색 기능
     # 검색 기능
     if st.session_state.active_qa:
         brand_name = '현대' if st.session_state.active_qa == 'H' else '기아'
